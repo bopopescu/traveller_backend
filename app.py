@@ -1,7 +1,11 @@
 
 from db_actions import createUser,updateProfile, getUserInfo, login, getListChats, getChatMessages
-from flask import Flask
+from flask import Flask,session,request
+
+
 app = Flask(__name__)
+
+
 
 @app.route('/')
 def hello_world():
@@ -13,30 +17,48 @@ def hello_world():
 
 @app.route('/searchpeople')
 def searchpeople():
-   return 'Hello World’
+   return 'TBD'
 
 '''
 create new user
 '''
-#TODO add variables
+
 @app.route('/createprofile', methods = ['GET', 'POST'])
 def create_profile():
    if request.method == 'POST':
-      user_id = createUser("email","password","name","surname","1998-11-06","nationality","url_picture")
+      email = request.form['email']
+      password = request.form['password']
+      name = request.form['name']
+      surname = request.form['surname']
+      birthday = request.form['birthday']
+      nationality = request.form['nationality']
+      url_picture = request.form['url_picture']
+      user_id = createUser(email,password,name,surname,birthday,nationality,url_picture)
       session['user_id'] = user_id
       return 'logged in'
+   else:
+      return 'create profile'
 
 '''
 update profile
 '''
-#TODO add variables
+
 @app.route('/updateprofile', methods = ['GET', 'POST'])
 def update_profile():
    if 'user_id' in session:
       user_id = session['user_id']
       if request.method == 'POST':
-         updateProfile(user_id,"email","password","nameUpdated","surname","birthday","nationality","url_picture")
+         email = request.form['email']
+         password = request.form['password']
+         name = request.form['name']
+         surname = request.form['surname']
+         birthday = request.form['birthday']
+         nationality = request.form['nationality']
+         url_picture = request.form['url_picture']
+         updateProfile(user_id,email,password,name,surname,birthday,nationality,url_picture)
          return getUserInfo(user_id)
+      else:
+         return 'profile'
    else:
       return 'not logged'
 
@@ -44,19 +66,25 @@ def update_profile():
 '''
 Login
 '''
-#TODO: add variables and if condition not correct
 @app.route('/login', methods = ['GET', 'POST'])
-def hello_world():
+def login():
    if request.method == 'POST':
-      user_id = login("email","password")
-      session['user_id'] = user_id
-      return 'Logged in’
+      email = request.form['email']
+      password = request.form['password']
+      user_id = login(email,password)
+      if user_id != None:
+         session['user_id'] = user_id
+         return 'Logged in'
+      else:
+         return 'wrong email or password'
+   else:
+      return 'login'
 
 '''
 Logout
 '''
 @app.route('/logout')
-def hello_world():
+def logout():
    if 'user_id' in session:
       session.pop('user_id', None)
       return 'logged out'
@@ -79,21 +107,39 @@ def get_chat_messages():
 get list of user's chats
 '''
 @app.route('/getlistchats')
-def hello_world():
+def get_list_chats():
    if 'user_id' in session:
       chats = getListChats(session['user_id'])
       return chats
    else:
       return 'not logged'
 
-#TODO add variables
-@app.route('/addmessage', methods = ['GET', 'POST'])
-def hello_world():
-   return 'Hello World’
+'''
+send message
+'''
 
-@app.route('/getuserinfo')
-def hello_world():
-   return 'Hello World’
+@app.route('/addmessage', methods = ['GET', 'POST'])
+def send_message():
+   if request.method == 'POST':
+      if 'conv_id' in session and 'user_id' in session:
+         conv_id = session['conv_id']
+         user_id = session['user_id']
+         text = request.form['text']
+         url_resource = request.form['url_resource']
+         mes_id = addMessage(conv_id,user_id,text,url_resource)
+         return mes_id
+      else:
+         return 'no chat selected/not logged'
+
+@app.route('/getuserinfo/<int:user>')
+def get_user_info(user):
+   if 'user_id' in session:
+      user_info = getUserInfo(user)
+      return user_info
+   else:
+      return 'not logged'
+   
 
 if __name__ == '__main__':
-   app.run()
+   app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+   app.run(debug = True)
