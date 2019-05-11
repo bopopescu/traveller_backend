@@ -1,5 +1,31 @@
 import mysql.connector
 
+class DB_Manager:
+    def __init__(self,host="localhost",user="root",password="password"):
+        print("DB_Manager started")
+        self.db = mysql.connector.connect(
+            host=host,
+            user=user,
+            passwd=password,
+            auth_plugin='mysql_native_password'
+        )
+
+    def reset(self,db):
+        print("Dropping " + db)
+        self.drop_db(db)
+        print("Restarting " + db)
+        self.start_db(db)
+        print("Reset of " + db + " completed")
+
+    def drop_db(self,db):
+        cursor = self.db.cursor()
+        cursor.execute("DROP DATABASE " + db)
+        return cursor
+
+    def start_db(self,db):
+        cursor = self.db.cursor()
+        cursor.execute("CREATE DATABASE " + db)
+        cursor.close()
 
 class DB:
     '''
@@ -7,13 +33,13 @@ class DB:
     @param host, user, password
     returns database
     '''
-    def __init__(self,db="traveller",host="localhost",user="root",password="password"):
+    def __init__(self,db="database",host="localhost",user="root",password="password"):
         self.db = mysql.connector.connect(
             host=host,
             user=user,
             passwd=password,
             database=db,
-            auth_plugin='caching_sha2_password'
+            auth_plugin='mysql_native_password'
         )
 
 
@@ -92,12 +118,19 @@ class DB:
     '''
     def insert_in_table(self,table_name, values_to_insert,columns = "",return_value = "lastrowid"):
         cursor=self.db.cursor()
-        sql = "INSERT INTO" + table_name + columns + "VALUES (%s,%s)"
+        sql = "INSERT INTO " + table_name + columns + " VALUES ("
+
+        for i in range(0,len(values_to_insert[0])):
+            sql += "%s,"
+
+        sql = sql[0:-1] + ")"
+        print(sql)
 
         if len(values_to_insert) > 1:
             cursor.executemany(sql,values_to_insert)
         elif len(values_to_insert) == 1:
-            mycursor.execute(sql, values_to_insert)
+            print(sql,values_to_insert[0])
+            cursor.execute(sql, values_to_insert[0])
 
         self.db.commit()
 
@@ -119,13 +152,15 @@ class DB:
     returns the selected rows
     '''
 
-    def select_from_table(self,table_name,columns = "*",where_condition = "",like_condition = "", order_by = "",return_value = "lastrowid"):
+    def select_from_table(self,table_name,columns = "*",where_condition = "",like_condition=""):
         cursor=self.db.cursor()
-        sql = "SELECT" + columns + "FROM " + table_name
+        sql = "SELECT " + columns + " FROM " + table_name
         if where_condition != "":
-            sql += "WHERE " + where_condition
+            sql += " WHERE " + where_condition
         if like_condition != "":
-            sql += "LIKE " + like_condition
+            sql += " LIKE " + like_condition
+
+        print(sql) 
         cursor.execute(sql)
         result = cursor.fetchall()
         
@@ -136,10 +171,4 @@ class DB:
         sql = "DROP TABLE " + table_name
         cursor.execute(sql)
         return cursor
-
-    def drop_all_tables(self):
-        tables = self.tables_list()
-
-        for table in tables:
-            self.drop_table(table['Tables_in_traveller'])
         
