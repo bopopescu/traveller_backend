@@ -29,7 +29,8 @@ returns user_id
 '''
 def login(email,password):
     user_id = db.select_from_table("login",where_condition = "mail = '" + email + "' AND password = '" + password + "'")
-    return user_id
+    print(user_id[0][0])
+    return user_id[0][0]
 
 '''
 add conversation

@@ -74,7 +74,7 @@ def login():
       email = request.form['email']
       password = request.form['password']
       user_id = db_actions.login(email,password)
-      if user_id != None:
+      if user_id != None and user_id != []:
          session['user_id'] = user_id
          return 'Logged in'
       else:
@@ -136,9 +136,10 @@ def send_message():
 @app.route('/getuserinfo/<user>')
 def get_user_info(user):
    if 'user_id' in session:
+      print(session['user_id'])
       user_info = getUserInfo(user)
       if user_info != None:
-         return user_info
+         return str(user_info)
       else:
          return 'user id is not valid'
    else:
@@ -151,7 +152,10 @@ def test_create_profile():
 
 @app.route('/testlogin', methods = ['GET', 'POST'])
 def test_login():
-   return render_template('test_login.html')
+   if 'user_id' in session:
+      return 'already logged in'
+   else:
+      return render_template('test_login.html')
 
 @app.route('/testlogout', methods = ['GET', 'POST'])
 def test_logout():
