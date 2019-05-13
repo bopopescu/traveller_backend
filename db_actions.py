@@ -80,4 +80,4 @@ def addMessage(conv_id, sender_user_id, text, url_resource=""):
 def getUserInfo(user_id):
     where = "user_id = " + str(user_id)
     user_info = db.select_from_table("user",where_condition = where)
-    return
+    return user_info

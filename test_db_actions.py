@@ -31,8 +31,9 @@ class DBActionsTest(unittest.TestCase):
         print(messages)
 
     def test_getUserInfo(self):
-        user_info = getUserInfo('1')
+        user_info = getUserInfo('9')
         print(user_info)
+        self.assertEqual(user_info,'lala')
 
 
 if __name__ == '__main__':

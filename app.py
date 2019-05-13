@@ -1,17 +1,18 @@
 
+import db_actions
 from db_actions import createUser,updateProfile, getUserInfo, login, getListChats, getChatMessages
-from flask import Flask,session,request
+from flask import Flask,session,request,render_template
 
 
 app = Flask(__name__)
 
-
+#TODO session['user_id'] = [] ????
 
 @app.route('/')
 def hello_world():
    if 'user_id' in session:
       user_id = session['user_id']
-      return "logged as " + user_id
+      return "logged as " + str(user_id)
    else:
       return "not logged"
 
@@ -52,9 +53,10 @@ def update_profile():
          password = request.form['password']
          name = request.form['name']
          surname = request.form['surname']
-         birthday = request.form['birthday']
+         birthday = request.values['birthday']
          nationality = request.form['nationality']
          url_picture = request.form['url_picture']
+         picture = request.files.get('file')
          updateProfile(user_id,email,password,name,surname,birthday,nationality,url_picture)
          return getUserInfo(user_id)
       else:
@@ -71,7 +73,7 @@ def login():
    if request.method == 'POST':
       email = request.form['email']
       password = request.form['password']
-      user_id = login(email,password)
+      user_id = db_actions.login(email,password)
       if user_id != None:
          session['user_id'] = user_id
          return 'Logged in'
@@ -131,13 +133,37 @@ def send_message():
       else:
          return 'no chat selected/not logged'
 
-@app.route('/getuserinfo/<int:user>')
+@app.route('/getuserinfo/<user>')
 def get_user_info(user):
    if 'user_id' in session:
       user_info = getUserInfo(user)
-      return user_info
+      if user_info != None:
+         return user_info
+      else:
+         return 'user id is not valid'
    else:
       return 'not logged'
+
+#=================TESTSSSSS===========
+@app.route('/testcreateprofile', methods = ['GET', 'POST'])
+def test_create_profile():
+   return render_template('test_createprofile.html')
+
+@app.route('/testlogin', methods = ['GET', 'POST'])
+def test_login():
+   return render_template('test_login.html')
+
+@app.route('/testlogout', methods = ['GET', 'POST'])
+def test_logout():
+   return render_template('test_logout.html')
+
+@app.route('/testgetlistchats', methods = ['GET', 'POST'])
+def test_get_list_chats():
+   return render_template('test_getlistchats.html')
+
+@app.route('/testgetuserinfo', methods = ['GET', 'POST'])
+def test_get_user_info():
+   return render_template('test_getuserinfo.html')
    
 
 if __name__ == '__main__':
