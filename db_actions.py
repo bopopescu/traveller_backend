@@ -2,17 +2,22 @@ import db_creation_fnc as database
 
 db = database.DB(db="data")
 
+#TODO connection integrity issue create user updatelocation
+
 '''
 Sign up a user. Insertion in login table and in user table
 
 returns user_id
 '''
-def createUser(email,password,name,surname,birthday,nationality,url_picture,languages_list="languages",interests_list="interests"):
+def createUser(email,password,name,surname,birthday,nationality,url_picture,lat,lon, languages_list="languages",interests_list="interests"):
     loginuser=[(email,password)]
     user_id = db.insert_in_table("login",loginuser,columns = "(mail,password)")
 
     user=[(name,surname,birthday,nationality,url_picture,languages_list,interests_list)]
     user_id = db.insert_in_table("user",user, columns = "(name,surname,birthday,nationality,url_picture,languages_list,interests_list)")
+
+    updateLocation(user_id,lat,lon)
+
     return user_id
 
 def updateProfile(user_id,name,surname,birthday,nationality,url_picture,languages_list="languages",interests_list="interests"):
@@ -29,8 +34,12 @@ returns user_id
 '''
 def login(email,password):
     user_id = db.select_from_table("login",where_condition = "mail = '" + email + "' AND password = '" + password + "'")
-    print(user_id[0][0])
-    return user_id[0][0]
+    
+    if user_id != []:
+        print(user_id[0][0])
+        return user_id[0][0]
+    else:
+        return None
 
 '''
 add conversation
@@ -82,3 +91,11 @@ def getUserInfo(user_id):
     where = "user_id = " + str(user_id)
     user_info = db.select_from_table("user",where_condition = where)
     return user_info
+
+'''
+update user's location
+'''
+
+def updateLocation(user_id,lat,lon):
+    update = db.update_table("locations",["lat","lon"],(lat,lon),"user_id = " + str(user_id))
+    return update

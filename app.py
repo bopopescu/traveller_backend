@@ -1,12 +1,13 @@
 
 import db_actions
-from db_actions import createUser,updateProfile, getUserInfo, login, getListChats, getChatMessages
+from db_actions import createUser,updateProfile, getUserInfo, login, getListChats, getChatMessages, updateLocation
 from flask import Flask,session,request,render_template
+from flask_cors import CORS
+import json
 
 
 app = Flask(__name__)
-
-#TODO session['user_id'] = [] ????
+CORS(app)
 
 @app.route('/')
 def hello_world():
@@ -34,8 +35,14 @@ def create_profile():
       birthday = request.form['birthday']
       nationality = request.form['nationality']
       url_picture = request.form['url_picture']
-      user_id = createUser(email,password,name,surname,birthday,nationality,url_picture)
+      lat = request.form['lat']
+      lon = request.form['lon']
+
+      user_id = createUser(email,password,name,surname,birthday,nationality,url_picture,lat,lon)
       session['user_id'] = user_id
+
+      # updateLocation(user_id,lat,lon)
+
       return 'logged in'
    else:
       return 'create profile'
@@ -71,12 +78,22 @@ Login
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
    if request.method == 'POST':
-      email = request.form['email']
-      password = request.form['password']
+      content = request.get_json(force = True)
+
+      print(content['email'])
+
+      email = content['email']
+      password = content['password']
+
       user_id = db_actions.login(email,password)
+
+      lat = content['lat']
+      lon = content['lon']
+
       if user_id != None and user_id != []:
          session['user_id'] = user_id
-         return 'Logged in'
+         updateLocation(user_id,lat,lon)
+         return user_id
       else:
          return 'wrong email or password'
    else:
@@ -168,6 +185,11 @@ def test_get_list_chats():
 @app.route('/testgetuserinfo', methods = ['GET', 'POST'])
 def test_get_user_info():
    return render_template('test_getuserinfo.html')
+
+
+@app.route('/testsearchpeople', methods = ['GET', 'POST'])
+def test_search_people():
+   return render_template('test_searchpeople.html')
    
 
 if __name__ == '__main__':

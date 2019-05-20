@@ -1,0 +1,35 @@
+<div id="geoloc"></div>
+
+<input id="lat" type="number" name="lat" />
+<input id="lon" type="number" name="lon" />
+
+<script>
+  getLocation();
+  var x = document.getElementById("geoloc");
+  var lat = document.getElementById("lat");
+  var lon = document.getElementById("lon");
+  function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+      x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+  }
+
+  function showPosition(position) {
+    console.log(
+      "Latitude: " +
+        position.coords.latitude +
+        "<br>Longitude: " +
+        position.coords.longitude
+    );
+    x.innerHTML =
+      "Latitude: " +
+      position.coords.latitude +
+      "<br>Longitude: " +
+      position.coords.longitude;
+
+    lat.value = position.coords.latitude;
+    lon.value = position.coords.longitude;
+  }
+</script>

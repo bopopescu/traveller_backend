@@ -2,5 +2,33 @@
         <input type="email" name="email" />
         <input type="password" name="password" />
 
+        <input id="lat" type="number" name="lat" step="any"/>
+<input id="lon" type="number" name="lon" step="any"/>
+
         <input type="submit">send</input>
 </form>
+
+<script>
+                getLocation();
+                var lat = document.getElementById("lat");
+                var lon = document.getElementById("lon");
+                function getLocation() {
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition);
+                  } else {
+                    x.innerHTML = "Geolocation is not supported by this browser.";
+                  }
+                }
+              
+                function showPosition(position) {
+                  console.log(
+                    "Latitude: " +
+                      position.coords.latitude +
+                      "<br>Longitude: " +
+                      position.coords.longitude
+                  );
+              
+                  lat.value = position.coords.latitude;
+                  lon.value = position.coords.longitude;
+                }
+              </script>

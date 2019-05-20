@@ -166,9 +166,31 @@ class DB:
         
         return result
 
+    '''
+    drop table
+    '''
     def drop_table(self,table_name):
         cursor = self.db.cursor(buffered=True,dictionary=True)
         sql = "DROP TABLE " + table_name
         cursor.execute(sql)
         return cursor
+
+    '''
+    update a table
+
+    @table_name name of the table
+    @columns list of columns to be updated (e.g. ['name','surname'])
+    @values tuple of the values to be put in the before mentioned columns (e.g. ('Chiara','Masci'))
+    @where_condition
+    '''
+    def update_table(self,table_name,columns,values,where_condition):
+        cursor = self.db.cursor(buffered=True,dictionary=True)
+        sql = "UPDATE " + table_name + " SET "
+        for column in columns:
+            sql += column + " = %s"
+
+        sql += " WHERE " + where_condition
+
+        cursor.execute(sql,val)
+        self.db.commit()
         

@@ -7,7 +7,7 @@ db = database.DB(db="data")
 
 db.create_table("login",
 ["user_id int NOT NULL AUTO_INCREMENT PRIMARY KEY",
-"mail VARCHAR(255) NOT NULL",
+"mail VARCHAR(255) NOT NULL UNIQUE",
 "password VARCHAR(255) NOT NULL"
 ])
 
@@ -35,5 +35,11 @@ db.create_table("message",
 "text VARCHAR(255) NOT NULL",
 "url_resource VARCHAR(255)"
 ], "FOREIGN KEY (conv_id) REFERENCES conversation(conv_id)")
+
+db.create_table("locations",
+["user_id int NOT NULL PRIMARY KEY",
+"lat float NOT NULL", 
+"lon float NOT NULL"],
+"FOREIGN KEY (user_id) REFERENCES login(user_id)")
 
 
