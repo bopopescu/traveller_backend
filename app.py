@@ -1,7 +1,7 @@
 
 import db_actions
 from db_actions import createUser,updateProfile, getUserInfo, login, getListChats, getChatMessages, updateLocation
-from flask import Flask,session,request,render_template
+from flask import Flask,session,request,render_template,jsonify
 from flask_cors import CORS
 import json
 
@@ -81,7 +81,7 @@ def update_profile():
       else:
          return 'profile'
    else:
-      return 'not logged'
+      return 'NOT_LOGGED'
 
 
 '''
@@ -100,12 +100,12 @@ def login():
       lat = content['lat']
       lon = content['lon']
 
-      print("HERE"+str(lat)+str(lon))
-
       if user_id != None and user_id != []:
          session['user_id'] = user_id
          updateLocation(user_id,lat,lon)
-         return str(user_id)
+         response = jsonify(str(user_id))
+         
+         return response
       else:
          return 'wrong email or password'
    else:
@@ -116,6 +116,7 @@ Logout
 '''
 @app.route('/logout')
 def logout():
+   print(session['user_id'])
    if 'user_id' in session:
       session.pop('user_id', None)
       return 'logged out'
@@ -143,7 +144,7 @@ def get_list_chats():
       chats = getListChats(session['user_id'])
       return chats
    else:
-      return 'not logged'
+      return 'NOT_LOGGED'
 
 '''
 send message
@@ -170,9 +171,9 @@ def get_user_info(user):
       if user_info != None:
          return str(user_info)
       else:
-         return 'user id is not valid'
+         return 'ID_NOT_VALID'
    else:
-      return 'not logged'
+      return 'NOT_LOGGED'
 
 #=================TESTSSSSS===========
 @app.route('/testcreateprofile', methods = ['GET', 'POST'])

@@ -1,9 +1,8 @@
 import db_creation_fnc as database
 
-db_man = database.DB_Manager()
-db_man.reset("data")
+db_man = database.DB_Manager("remotemysql.com",3306,"AP2pUlIJEe","1zP34rKdgi")
 
-db = database.DB(db="data")
+db = database.DB("AP2pUlIJEe","remotemysql.com",3306,"AP2pUlIJEe","1zP34rKdgi")
 
 db.create_table("login",
 ["user_id int NOT NULL AUTO_INCREMENT PRIMARY KEY",

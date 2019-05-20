@@ -1,11 +1,12 @@
 import mysql.connector
 
 class DB_Manager:
-    def __init__(self,host="localhost",user="root",password="password"):
+    def __init__(self,host="localhost",port = "", user="root",password="password"):
         print("DB_Manager started")
         self.db = mysql.connector.connect(
             host=host,
             user=user,
+            port=port,
             passwd=password,
             auth_plugin='mysql_native_password'
         )
@@ -33,9 +34,10 @@ class DB:
     @param host, user, password
     returns database
     '''
-    def __init__(self,db="database",host="localhost",user="root",password="password"):
+    def __init__(self,db="database",host="localhost",port = "",user="root",password="password"):
         self.db = mysql.connector.connect(
             host=host,
+            port=port,
             user=user,
             passwd=password,
             database=db,

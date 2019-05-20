@@ -1,6 +1,7 @@
 import db_creation_fnc as database
 
-db = database.DB(db="data")
+#db = database.DB(db="data")
+db = database.DB("AP2pUlIJEe","remotemysql.com",3306,"AP2pUlIJEe","1zP34rKdgi")
 
 #TODO connection integrity issue create user updatelocation
 
