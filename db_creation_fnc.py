@@ -183,13 +183,15 @@ class DB:
     @values tuple of the values to be put in the before mentioned columns (e.g. ('Chiara','Masci'))
     @where_condition
     '''
-    def update_table(self,table_name,columns,values,where_condition):
+    def update_table(self,table_name,columns,val,where_condition):
         cursor = self.db.cursor(buffered=True,dictionary=True)
         sql = "UPDATE " + table_name + " SET "
         for column in columns:
-            sql += column + " = %s"
+            sql += " " + column + " = %s,"
 
-        sql += " WHERE " + where_condition
+    
+        sql = sql[0:-1] + " WHERE " + where_condition
+        print("Na, here: "+ sql)
 
         cursor.execute(sql,val)
         self.db.commit()

@@ -97,5 +97,6 @@ update user's location
 '''
 
 def updateLocation(user_id,lat,lon):
-    update = db.update_table("locations",["lat","lon"],(lat,lon),"user_id = " + str(user_id))
-    return update
+    print((lat,lon))
+    db.update_table("locations",["lat","lon"],(lat,lon),"user_id = " + str(user_id))
+    return user_id

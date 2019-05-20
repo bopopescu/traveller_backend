@@ -28,22 +28,24 @@ create new user
 @app.route('/createprofile', methods = ['GET', 'POST'])
 def create_profile():
    if request.method == 'POST':
-      email = request.form['email']
-      password = request.form['password']
-      name = request.form['name']
-      surname = request.form['surname']
-      birthday = request.form['birthday']
-      nationality = request.form['nationality']
-      url_picture = request.form['url_picture']
-      lat = request.form['lat']
-      lon = request.form['lon']
+      content = request.get_json(force = True)
+
+      email = content['email']
+      password = content['password']
+      name = content['name']
+      surname = content['surname']
+      birthday = content['birthday']
+      nationality = content['nationality']
+      url_picture = content['url_picture']
+      lat = content['lat']
+      lon = content['lon']
 
       user_id = createUser(email,password,name,surname,birthday,nationality,url_picture,lat,lon)
       session['user_id'] = user_id
 
       # updateLocation(user_id,lat,lon)
 
-      return 'logged in'
+      return user_id
    else:
       return 'create profile'
 
@@ -56,14 +58,24 @@ def update_profile():
    if 'user_id' in session:
       user_id = session['user_id']
       if request.method == 'POST':
-         email = request.form['email']
-         password = request.form['password']
-         name = request.form['name']
-         surname = request.form['surname']
-         birthday = request.values['birthday']
-         nationality = request.form['nationality']
-         url_picture = request.form['url_picture']
-         picture = request.files.get('file')
+         content = request.get_json(force = True)
+
+         email = content['email']
+         password = content['password']
+         name = content['name']
+         surname = content['surname']
+         birthday = content['birthday']
+         nationality = content['nationality']
+         url_picture = content['url_picture']
+
+         # email = request.form['email']
+         # password = request.form['password']
+         # name = request.form['name']
+         # surname = request.form['surname']
+         # birthday = request.values['birthday']
+         # nationality = request.form['nationality']
+         # url_picture = request.form['url_picture']
+         # picture = request.files.get('file')
          updateProfile(user_id,email,password,name,surname,birthday,nationality,url_picture)
          return getUserInfo(user_id)
       else:
@@ -80,8 +92,6 @@ def login():
    if request.method == 'POST':
       content = request.get_json(force = True)
 
-      print(content['email'])
-
       email = content['email']
       password = content['password']
 
@@ -90,10 +100,12 @@ def login():
       lat = content['lat']
       lon = content['lon']
 
+      print("HERE"+str(lat)+str(lon))
+
       if user_id != None and user_id != []:
          session['user_id'] = user_id
          updateLocation(user_id,lat,lon)
-         return user_id
+         return str(user_id)
       else:
          return 'wrong email or password'
    else:
