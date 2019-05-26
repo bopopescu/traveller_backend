@@ -7,6 +7,7 @@ import json
 
 
 app = Flask(__name__)
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 CORS(app)
 
 @app.route('/')
@@ -203,8 +204,14 @@ def test_get_user_info():
 @app.route('/testsearchpeople', methods = ['GET', 'POST'])
 def test_search_people():
    return render_template('test_searchpeople.html')
-   
+
+@app.after_request
+def after_request(response):
+  response.headers.add('Access-Control-Allow-Origin', '*')
+  response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+  response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+  return response
+  
 
 if __name__ == '__main__':
-   app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
    app.run(debug = True)

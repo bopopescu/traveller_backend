@@ -83,6 +83,7 @@ class DB:
 
         print(sql)
         cursor.execute(sql)
+        cursor.close()
         return cursor
 
 
@@ -106,6 +107,7 @@ class DB:
     def alter_table(self,table_name,alter_command):
         cursor=self.db.cursor()
         cursor.execute("ALTER TABLE"+ table_name + alter_command)
+        cursor.close()
         return cursor
 
     '''
@@ -135,6 +137,7 @@ class DB:
             cursor.execute(sql, values_to_insert[0])
 
         self.db.commit()
+        cursor.close()
 
         if return_value == "rowcount":
             return cursor.rowcount
@@ -165,6 +168,7 @@ class DB:
         print(sql) 
         cursor.execute(sql)
         result = cursor.fetchall()
+        cursor.close()
         
         return result
 
@@ -175,6 +179,7 @@ class DB:
         cursor = self.db.cursor(buffered=True,dictionary=True)
         sql = "DROP TABLE " + table_name
         cursor.execute(sql)
+        cursor.close()
         return cursor
 
     '''
@@ -197,4 +202,5 @@ class DB:
 
         cursor.execute(sql,val)
         self.db.commit()
+        cursor.close()
         
