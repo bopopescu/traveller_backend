@@ -167,7 +167,7 @@ class DB:
 
         print(sql) 
         cursor.execute(sql)
-        result = cursor.fetchall()
+        result = cursor.fetchone()
         cursor.close()
         
         return result
