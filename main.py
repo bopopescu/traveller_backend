@@ -179,9 +179,9 @@ def get_list_chats():
             conversations = []
             for chat in chats:
                 if chat['user_id1'] != user_id:
-                    name = getUserInfo(chat['user_id2'])['name']
-                else:
                     name = getUserInfo(chat['user_id1'])['name']
+                else:
+                    name = getUserInfo(chat['user_id2'])['name']
 
                 conv = {'conv_id': chat['conv_id'], 'name': name}
                 conversations.append(conv)
@@ -211,17 +211,24 @@ def send_message():
             return 'no chat selected/not logged'
 
 
-@app.route('/getuserinfo/<user>')
-def get_user_info(user):
-    if 'user_id' in session:
-        print(session['user_id'])
-        user_info = getUserInfo(user)
-        if user_info != None:
-            return str(user_info)
+@app.route('/getuserinfo/', methods=['GET', 'POST'])
+def get_user_info():
+    if request.method == 'POST':
+        if 'user_id' in session:
+            print(session['user_id'])
+            user_info = getUserInfo(user)
+            if user_info != None:
+                return str(user_info)
+            else:
+                return 'ID_NOT_VALID'
         else:
-            return 'ID_NOT_VALID'
+            content = request.get_json(force=True)
+            user_id = content['user_id']
+            user_info = getUserInfo(user_id)
+            response = jsonify(user_info)
+            return response
     else:
-        return 'NOT_LOGGED'
+        return 'blaaaa'
 
 # =================TESTSSSSS===========
 @app.route('/testcreateprofile', methods=['GET', 'POST'])

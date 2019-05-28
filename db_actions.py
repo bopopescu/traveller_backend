@@ -76,7 +76,7 @@ returns result: conversations
 
 
 def getListChats(user_id):
-    where = "user_id1 = " + user_id + " OR user_id2 = " + user_id
+    where = "user_id1 = " + str(user_id) + " OR user_id2 = " + str(user_id)
     result = db.select_from_table(
         "conversation", where_condition=where, multiple=True)
     return result
