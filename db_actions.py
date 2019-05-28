@@ -1,8 +1,9 @@
 import db_creation_fnc as database
 
-#db = database.DB(db="data")
-db = database.DB("AP2pUlIJEe", "remotemysql.com",
-                 3306, "AP2pUlIJEe", "1zP34rKdgi")
+db = database.DB(db="data")
+# db = database.DB("AP2pUlIJEe", "remotemysql.com",
+#                  3306, "AP2pUlIJEe", "1zP34rKdgi")
+
 
 # TODO connection integrity issue create user updatelocation
 
@@ -76,7 +77,8 @@ returns result: conversations
 
 def getListChats(user_id):
     where = "user_id1 = " + user_id + " OR user_id2 = " + user_id
-    result = db.select_from_table("conversation", where_condition=where)
+    result = db.select_from_table(
+        "conversation", where_condition=where, multiple=True)
     return result
 
 
@@ -129,3 +131,18 @@ def updateLocation(user_id, lat, lon):
     db.update_table("locations", ["lat", "lon"],
                     (lat, lon), "user_id = " + str(user_id))
     return user_id
+
+
+'''
+search people
+
+@param user_id, lat, lon
+@returns list_people: [{userinfos...},{userinfos...}]
+'''
+
+# TODO: only one result is returned ("fetch_one" in select_from_table) and order depending on distance range
+
+
+def searchPeople(user_id, lat, lon):
+    list_people = db.select_from_table("user", multiple=True)
+    return list_people

@@ -1,13 +1,11 @@
-
 import db_actions
-from db_actions import createUser, updateProfile, getUserInfo, login, getListChats, getChatMessages, updateLocation
+from db_actions import createUser, updateProfile, getUserInfo, login, getListChats, getChatMessages, updateLocation, addMessage, searchPeople
 from flask import Flask, session, request, render_template, jsonify
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import json
 
 
 app = Flask(__name__)
-app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 CORS(app)
 
 
@@ -20,9 +18,17 @@ def hello_world():
         return "not logged"
 
 
-@app.route('/searchpeople')
-def searchpeople():
-    return 'TBD'
+@app.route('/searchpeople', methods=['GET', 'POST'])
+def search_people():
+    if request.method == 'POST':
+        content = request.get_json(force=True)
+        user_id = content['user_id']
+        lat = content['lat']
+        lon = content['lon']
+
+        result = searchPeople(user_id, lat, lon)
+        response = jsonify(result)
+        return response
 
 
 '''
@@ -31,6 +37,7 @@ create new user
 
 
 @app.route('/createprofile', methods=['GET', 'POST'])
+@cross_origin()
 def create_profile():
     if request.method == 'POST':
         content = request.get_json(force=True)
@@ -51,7 +58,10 @@ def create_profile():
 
         # updateLocation(user_id,lat,lon)
 
-        return user_id
+        response = jsonify(str(user_id))
+        print(response)
+
+        return response
     else:
         return 'create profile'
 
@@ -97,22 +107,23 @@ def update_profile():
 Login
 '''
 @app.route('/login', methods=['GET', 'POST'])
-def login():
+def login_1():
     if request.method == 'POST':
         content = request.get_json(force=True)
 
         email = content['email']
         password = content['password']
 
-        user_id = db_actions.login(email, password)
+        result = db_actions.login(email, password)
+        user_id = result['user_id']
 
         lat = content['lat']
         lon = content['lon']
 
         if user_id != None and user_id != []:
-            session['user_id'] = user_id[0]
+            session['user_id'] = user_id
             # updateLocation(user_id,lat,lon)
-            response = jsonify(str(user_id[0]))
+            response = jsonify(user_id)
 
             return response
         else:
@@ -126,7 +137,7 @@ Logout
 '''
 @app.route('/logout')
 def logout():
-    print(session['user_id'])
+    print(session.get('user_id'))
     if 'user_id' in session:
         session.pop('user_id', None)
         return 'logged out'
@@ -137,26 +148,48 @@ def logout():
 '''
 Gets messages of a conversation
 '''
-@app.route('/getchatmessages')
+@app.route('/getchatmessages', methods=['GET', 'POST'])
 def get_chat_messages():
-    if 'conv_id' in session:
-        conv_id = session['conv_id']
-        chats = getChatMessages(conv_id)
-        return chats
+    if request.method == 'POST':
+        if 'conv_id' in session:
+            conv_id = session['conv_id']
+            chats = getChatMessages(conv_id)
+            return chats
+        else:
+            return 'no chat selected'
     else:
-        return 'no chat selected'
+        return 'getchatmessages'
 
 
 '''
 get list of user's chats
 '''
-@app.route('/getlistchats')
+# TODO solve persistance session
+@app.route('/getlistchats/', methods=['GET', 'POST'])
 def get_list_chats():
-    if 'user_id' in session:
-        chats = getListChats(session['user_id'])
-        return chats
+    if request.method == 'POST':
+        if 'user_id' in session:
+            chats = getListChats(session['user_id'])
+            return chats
+        else:
+            content = request.get_json(force=True)
+            user_id = content['user_id']
+            chats = getListChats(user_id)
+
+            conversations = []
+            for chat in chats:
+                if chat['user_id1'] != user_id:
+                    name = getUserInfo(chat['user_id2'])['name']
+                else:
+                    name = getUserInfo(chat['user_id1'])['name']
+
+                conv = {'conv_id': chat['conv_id'], 'name': name}
+                conversations.append(conv)
+
+            response = jsonify(conversations)
+            return response
     else:
-        return 'NOT_LOGGED'
+        return 'lala'
 
 
 '''
@@ -235,4 +268,5 @@ def after_request(response):
 
 
 if __name__ == '__main__':
+    app.config["SECRET_KEY"] = "OCML3BRawWEUeaxcuKHLpw"
     app.run(debug=True)
